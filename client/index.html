@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Collaborative Canvas</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="joinScreen">
+    <h2>Join a Drawing Room</h2>
+    <input type="text" id="username" placeholder="Your name" />
+    <input type="text" id="roomId" placeholder="Room name (e.g. room1)" />
+    <button id="joinBtn">Join</button>
+  </div>
+
+  <div id="app" style="display:none;">
+    <div id="container">
+      <!-- Left Sidebar -->
+      <div id="sidebar">
+        <h3 id="roomName">Room:</h3>
+        <ul id="userList"></ul>
+      </div>
+
+      <!-- Main Content Area -->
+      <div id="mainContent">
+        <div class="toolbar">
+          <label>Color:</label>
+          <input type="color" id="colorPicker" value="#000000" />
+
+          <label>Brush Size:</label>
+          <input type="range" id="brushSize" min="1" max="20" value="4" />
+
+          <button id="clearBtn">Clear</button>
+        </div>
+
+        <canvas id="drawingCanvas"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+
+
+
+</html>
