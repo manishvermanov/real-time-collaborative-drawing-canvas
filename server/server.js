@@ -28,7 +28,18 @@ io.on("connection", (socket) => {
   socket.on("stroke", (stroke) => handleStroke(socket, stroke));
   socket.on("clear-room", () => handleClear(socket, io));
   socket.on("disconnect", () => handleDisconnect(socket, io));
+  socket.on("cursor", (data) => {
+  socket.to(socket.data.roomId).emit("cursor", {
+    id: socket.id,
+    username: socket.data.username,
+    x: data.x,
+    y: data.y
+  });
 });
+});
+
+
+
 
 httpServer.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

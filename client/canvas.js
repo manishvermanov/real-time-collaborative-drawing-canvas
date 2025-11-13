@@ -1,10 +1,16 @@
-export function setupCanvas(socket, roomId, username) {
-  const canvas = document.getElementById("drawingCanvas");
-  const ctx = canvas.getContext("2d");
+export function setupCanvas(socket, roomId, username) { 
+  const drawCanvas = document.getElementById("drawingCanvas");
+  const drawCtx = drawCanvas.getContext("2d");
 
-  // Adjust canvas size
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight - 60;
+  const cursorCanvas = document.getElementById("cursorCanvas");
+  const cursorCtx = cursorCanvas.getContext("2d");
+
+  // Match sizes
+  drawCanvas.width = cursorCanvas.width = window.innerWidth;
+  drawCanvas.height = cursorCanvas.height = window.innerHeight - 60;
+
+  let otherCursors = {};
+  let lastCursorEmit = 0;
 
   let drawing = false;
   let color = document.getElementById("colorPicker").value;
@@ -18,100 +24,113 @@ export function setupCanvas(socket, roomId, username) {
     size = e.target.value;
   });
 
-  canvas.addEventListener("mousedown", () => {
-    drawing = true;
+  // Unified mousemove handler
+  drawCanvas.addEventListener("mousemove", (e) => {
+    const rect = drawCanvas.getBoundingClientRect();
+const x = e.clientX - rect.left;
+const y = e.clientY - rect.top;
+
+
+    const now = Date.now();
+    if (now - lastCursorEmit > 30) {
+      socket.emit("cursor", { x, y });
+      lastCursorEmit = now;
+    }
+
+    if (drawing) {
+      const stroke = { x, y, color, size };
+      drawStroke(stroke);
+      socket.emit("stroke", stroke);
+    }
   });
 
-  canvas.addEventListener("mouseup", () => {
+  drawCanvas.addEventListener("mousedown", () => drawing = true);
+  drawCanvas.addEventListener("mouseup", () => {
     drawing = false;
-    ctx.beginPath();
+    drawCtx.beginPath();
   });
 
-  canvas.addEventListener("mousemove", (e) => {
-    if (!drawing) return;
-    const x = e.clientX;
-    const y = e.clientY;
-    const stroke = { x, y, color, size };
-    drawStroke(stroke);
-    socket.emit("stroke", stroke);
-  });
-
-  // Draw function (same as before)
   function drawStroke({ x, y, color, size }) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x, y, size / 2, 0, Math.PI * 2);
-    ctx.fill();
+    drawCtx.fillStyle = color;
+    drawCtx.beginPath();
+    drawCtx.arc(x, y, size / 2, 0, Math.PI * 2);
+    drawCtx.fill();
   }
 
-  // Receive strokes from others
-  socket.on("stroke", (stroke) => drawStroke(stroke));
+  function drawOtherCursors() {
+    cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
 
-  // Clear button
+    Object.values(otherCursors).forEach(cursor => {
+      cursorCtx.beginPath();
+      cursorCtx.fillStyle = "blue";
+      cursorCtx.arc(cursor.x, cursor.y, 6, 0, Math.PI * 2);
+      cursorCtx.fill();
+
+      cursorCtx.fillStyle = "black";
+      cursorCtx.font = "12px Arial";
+      cursorCtx.fillText(cursor.username, cursor.x + 10, cursor.y + 4);
+    });
+  }
+
+  socket.on("stroke", (stroke) => {
+    drawStroke(stroke);
+  });
+
   document.getElementById("clearBtn").addEventListener("click", () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
     socket.emit("clear-room");
   });
 
   socket.on("clear-canvas", () => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+    cursorCtx.clearRect(0, 0, cursorCanvas.width, cursorCanvas.height);
   });
 
-  // Debug 
-  // socket.onAny((event, ...args) => {
-  //   console.log("Received event:", event, args);
-  // });
+  socket.on("init-canvas", (strokes) => {
+    drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
 
+    for (const s of strokes) {
+      drawStroke(s);
+    }
 
-  // Displaying room and user list
+    drawOtherCursors();
+  });
 
   const roomNameEl = document.getElementById("roomName");
-  const userListEl = document.getElementById("userList");
+  if (roomNameEl) roomNameEl.textContent = `Room: ${roomId}`;
 
-  if (roomNameEl) 
-    roomNameEl.textContent = `Room: ${roomId}`;
+  function updateUserList(userNames = []) {
+    const userListEl = document.getElementById("userList");
+    if (!userListEl) return;
 
-  // Local cache of users
-  let users = [username];
+    userListEl.innerHTML = "";
 
- function updateUserList(userNames = []) {
-  const userListEl = document.getElementById("userList");
-  if (!userListEl) return;
-
-  userListEl.innerHTML = ""; // clear list
-
-  userNames.forEach((name) => {
-    const li = document.createElement("li");
-    li.textContent = name === username ? `${name} (You)` : name;
-    userListEl.appendChild(li);
-  });
-}
-// When joining a room, load all existing strokes
-socket.on("init-canvas", (strokes) => {
-  if (!Array.isArray(strokes)) return;
-
-  // Clear canvas before replaying strokes
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  // Redraw every saved stroke one-by-one
-  for (const s of strokes) {
-    drawStroke(s);
+    userNames.forEach((name) => {
+      const li = document.createElement("li");
+      li.textContent = name === username ? `${name} (You)` : name;
+      userListEl.appendChild(li);
+    });
   }
-});
 
-
-  // Show yourself immediately
-  updateUserList();
-
-  // Update list when server sends new info
   socket.on("update-user-list", (userNames) => {
-    console.log("Received update-user-list:", userNames);
     updateUserList(userNames);
   });
 
-  // Log join/leave for debugging
-  // socket.on("user-joined", (user) => console.log(`${user.name} joined`));
-  // socket.on("user-left", (user) => console.log(`${user.name} left`));
-}
+  socket.on("cursor", (data) => {
+    otherCursors[data.id] = {
+      username: data.username,
+      x: data.x,
+      y: data.y
+    };
 
-// console.log("hello")
+    drawOtherCursors();
+  });
+
+  socket.on("user-left", (user) => {
+    delete otherCursors[user.id];
+    drawOtherCursors();
+  });
+
+  updateUserList([username]);
+}
