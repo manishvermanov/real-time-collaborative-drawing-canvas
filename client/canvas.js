@@ -1,4 +1,4 @@
-export function setupCanvas(socket, roomId, username) { 
+function setupCanvas(socket, roomId, username) { 
   const drawCanvas = document.getElementById("drawingCanvas");
   const drawCtx = drawCanvas.getContext("2d");
 
@@ -27,9 +27,8 @@ export function setupCanvas(socket, roomId, username) {
   // Unified mousemove handler
   drawCanvas.addEventListener("mousemove", (e) => {
     const rect = drawCanvas.getBoundingClientRect();
-const x = e.clientX - rect.left;
-const y = e.clientY - rect.top;
-
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
 
     const now = Date.now();
     if (now - lastCursorEmit > 30) {
@@ -134,3 +133,6 @@ const y = e.clientY - rect.top;
 
   updateUserList([username]);
 }
+
+// Make function globally available
+window.setupCanvas = setupCanvas;
