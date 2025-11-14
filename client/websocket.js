@@ -11,7 +11,7 @@
 
 
 function initSocket(roomId, username) {
-  const socket = io("https://real-time-collaborative-drawing-canvas-production.up.railway.app", {
+  const socket = io("https://enchanting-clarity-production-a5a7.up.railway.app/", {
     transports: ["websocket"],
     withCredentials: false
   });
