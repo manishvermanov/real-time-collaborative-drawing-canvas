@@ -11,15 +11,15 @@ import {
   handleDisconnect
 } from "./rooms.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer);
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
-app.use(express.static(path.join(__dirname, "../client")));
+
+app.get('/', (req, response)=>{
+  response.send("op")
+})
 
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
@@ -37,9 +37,6 @@ io.on("connection", (socket) => {
   });
 });
 });
-
-
-
 
 httpServer.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
