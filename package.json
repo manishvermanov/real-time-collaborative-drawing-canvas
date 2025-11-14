@@ -1,17 +1,5 @@
 {
-  "name": "collaborative-canvas",
-  "version": "1.0.0",
-  "description": "Real-Time Collaborative Drawing Canvas",
-  "main": "server/server.js",
-  "type": "module",
-  "scripts": {
-    "start": "node server/server.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "express": "^5.1.0",
-    "socket.io": "^4.8.1"
-  }
+  "name": "collaborative-canvas-root",
+  "private": true,
+  "version": "1.0.0"
 }
