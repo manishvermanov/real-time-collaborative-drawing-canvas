@@ -36,7 +36,7 @@ Users can join rooms, draw together, see live cursors, add shapes, insert images
 
 ---
 
-## 📦 Installation & Setup
+##  Installation & Setup
 
 ### **Prerequisites**
 

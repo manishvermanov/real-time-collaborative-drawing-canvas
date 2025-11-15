@@ -1,5 +1,5 @@
 function initSocket(roomId, username, clientId) {
-  const socket = io("http://localhost:3000/", {
+  const socket = io("https://enchanting-clarity-production-7496.up.railway.app/", { //chnage to localhost to run on loacl
     transports: ["websocket"],
     withCredentials: false,
     auth: { clientId }
