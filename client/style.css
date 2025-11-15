@@ -25,13 +25,14 @@ body {
   color: #333;
 }
 
-/* Container layout */
+/* Main layout container */
 #container {
   display: flex;
   height: calc(100vh - 50px);
+  overflow: hidden;
 }
 
-/* Sidebar */
+/* Sidebar (desktop default) */
 #sidebar {
   width: 220px;
   background: #ffffff;
@@ -42,7 +43,7 @@ body {
 }
 
 .sidebar-title {
-  margin-top: 0;
+  margin: 0;
   font-size: 18px;
   font-weight: 700;
   color: #444;
@@ -50,9 +51,9 @@ body {
 
 .room-label {
   padding: 8px 12px;
-  background: #f1f1f1;
+  background: #efefef;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin: 10px 0 20px;
   font-size: 14px;
 }
 
@@ -60,7 +61,6 @@ body {
   font-size: 14px;
   font-weight: 600;
   margin-top: 10px;
-  margin-bottom: 10px;
   color: #666;
 }
 
@@ -81,10 +81,6 @@ body {
   color: #333;
   display: flex;
   align-items: center;
-
-   list-style: none;
-
-
 }
 
 .user-dot {
@@ -94,8 +90,7 @@ body {
   margin-right: 8px;
 }
 
-
-/* Main area */
+/* Main Content (canvas side) */
 #mainContent {
   flex: 1;
   display: flex;
@@ -104,7 +99,7 @@ body {
   box-sizing: border-box;
 }
 
-/* Canvas wrapper with shadow */
+/* Canvas Wrapper */
 #canvasWrapper {
   flex: 1;
   background: white;
@@ -114,7 +109,6 @@ body {
   overflow: hidden;
 }
 
-/* Important: no width/height here */
 #drawingCanvas,
 #cursorCanvas {
   position: absolute;
@@ -122,12 +116,11 @@ body {
   left: 0;
 }
 
-
 #cursorCanvas {
-  pointer-events: none;   /* <-- ADD THIS */
+  pointer-events: none;
 }
 
-/* Bottom Toolbar */
+/* Bottom Tool Bar */
 #bottomToolbar {
   margin-top: 12px;
   padding: 10px 16px;
@@ -139,39 +132,35 @@ body {
   gap: 12px;
   width: fit-content;
   align-self: flex-end;
+  z-index: 20;
 }
 
+#bottomToolbar button,
 #bottomToolbar input[type="color"],
-#bottomToolbar input[type="range"],
-#bottomToolbar button {
+#bottomToolbar input[type="range"] {
   cursor: pointer;
 }
 
-/* Base button style */
 #bottomToolbar button {
-  background: #e0e0e0;     /* light gray */
+  background: #e0e0e0;
   border: none;
   padding: 8px 14px;
   border-radius: 6px;
-  cursor: pointer;
   font-size: 14px;
   color: #333;
-  transition: background 0.2s, color 0.2s;
+  transition: background 0.2s;
 }
 
-/* On hover */
 #bottomToolbar button:hover {
   background: #d5d5d5;
 }
 
-/* Highlight active tool */
 .tool-selected {
-  background: #4a90e2 !important; /* blue */
+  background: #4a90e2 !important;
   color: white !important;
 }
 
-
-/* Join screen (unchanged but cleaner) */
+/* Join screen */
 #joinScreen {
   text-align: center;
   margin-top: 15%;
@@ -189,10 +178,59 @@ body {
   cursor: pointer;
 }
 
-
-
-
-#drawingCanvas, 
+/* Hide default cursor */
+#drawingCanvas,
 #cursorCanvas {
-  cursor: none;   
+  cursor: none;
+}
+
+/* ------------------------------- */
+/*          MOBILE VERSION         */
+/* ------------------------------- */
+@media (max-width: 768px) {
+
+  /* Stack vertically */
+  #container {
+    flex-direction: column;
+  }
+
+  /* Sidebar becomes top info bar */
+  #sidebar {
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    overflow-x: auto;
+    border-bottom: 1px solid #ddd;
+    border-right: none;
+  }
+
+  #userList li {
+    display: inline-flex;
+    flex-direction: row;
+    margin-right: 12px;
+    margin-bottom: 0;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+
+  /* Canvas fills the rest */
+  #canvasWrapper {
+    height: calc(100vh - 200px);
+    margin-top: 10px;
+  }
+
+  /* Bottom toolbar becomes fixed */
+  #bottomToolbar {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 30px);
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 14px;
+  }
 }
