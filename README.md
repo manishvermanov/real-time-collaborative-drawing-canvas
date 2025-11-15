@@ -1,206 +1,190 @@
-Collaborative Realtime Canvas
+# 🖼️ Collaborative Realtime Canvas
 
-A real-time multi-user drawing board built using Node.js, Express, Socket.IO, and Vanilla JavaScript.
+A real-time multi-user drawing board built using **Node.js**, **Express**, **Socket.IO**, and **Vanilla JavaScript**.
 Users can join rooms, draw together, see live cursors, add shapes, insert images, undo/redo strokes, and more.
 
+---
 
-Features
+## Features
 
-Drawing Tools
+### Drawing Tools
 
-Brush (with custom size & colors)
+* Brush (with custom size & colors)
+* Eraser (square cursor)
+* Line, Rectangle, Circle (shape preview with crosshair cursor)
+* Image upload tool (click → place image)
 
-Eraser (square cursor)
+###  Realtime Collaboration
 
-Line, Rectangle, Circle (shape preview with crosshair cursor)
+* Multiple users drawing simultaneously
+* Unique user colors
+* Live cursor movement
+* Participants list with active users
+* Room-based isolation
 
-Image upload tool (click → place image)
+### Canvas State
 
+* Full stroke history stored in room memory
+* Undo / Redo across all users
+* Clear board for the whole room
+* Initializes new users with the existing canvas state
 
-Realtime Collaboration
+###  Performance Tools
 
-Multiple users drawing simultaneously
+* Live FPS counter
+* Low-latency Socket events
 
-Unique user colors
+---
 
-Live cursor movement
+## 📦 Installation & Setup
 
-Participants list with active users
+### **Prerequisites**
 
-Room-based isolation
+* Node.js (v16+)
+* npm
 
+---
 
-Canvas State
+### **1. Clone the Project**
 
-Full stroke history stored in room memory
-
-Undo / Redo across all users
-
-Clear board for the whole room
-
-Initializes new users with the existing canvas state
-
-
-Performance Tools
-
-Live FPS counter
-
-Low-latency Socket events
-
-
-
-Installation & Setup
-
-Prerequisites
-
-Node.js (v16+)
-
-npm
-
-1. Clone the Project
+```sh
 git clone <your-repo-url>
 cd collaborative-canvas
+```
 
-2. Install Dependencies
+### **2. Install Dependencies**
+
+```sh
 npm install
+```
 
-3. Run the Server 
+### **3. Run the Server**
+
+```sh
 npm start
-Note :Change Websocket urk to "http://localhost:3000" from "https://enchanting-clarity-production-7496.up.railway.app/" (client -> websocket.js)
+(Note :Change Websocket urk to "http://localhost:3000" from "https://enchanting-clarity-production-7496.up.railway.app/" (client -> websocket.js))
 
-4. Open the App
+```
+
+### **4. Open the App**
 
 Visit:
+
+```
 http://localhost:3000
+```
 
+---
 
-Testing With Multiple Users
+##  Testing With Multiple Users
 
 To test real-time collaboration:
 
+### **Method 1: Multiple Browser Windows**
 
-Method 1: Multiple Browser Windows
+1. Open `http://localhost:3000` in Chrome
+2. Open another window in Firefox or Chrome Incognito
+3. Join the same room name
+4. Draw and interact — everything should sync live
 
-Open http://localhost:3000 in Chrome
+### **Method 2: Share LAN with Friends**
 
-Open another window in Firefox or Chrome Incognito
+1. Find your local network IP:
 
-Join the same room name
+   ```sh
+   ipconfig
+   ```
+2. Look for an address like:
 
-Draw and interact — everything should sync live
+   ```
+   192.168.x.x
+   ```
+3. Run server with:
 
+   ```sh
+   npm start
+   ```
+4. Ask friends on the same WiFi to open:
 
-Method 2: Share LAN with Friends
+   ```
+   http://192.168.x.x:3000
+   ```
 
-Find your local network IP:
+---
 
-ipconfig
+##  How to Use
 
+### **Joining**
 
-Look for an address like:
+* Enter your **name**
+* Enter **room name** (any string, e.g., `class1`, `project-room`, `demo`)
+* Click **Join**
 
-192.168.x.x
+### **Drawing**
 
+* Use bottom toolbar:
 
-Run server with:
+  * Brush / Eraser
+  * Shapes
+  * Image tool (click canvas → pick image)
+  * Undo / Redo
+  * Clear board
+* Color & brush size also available
 
-npm start
+### **Participants**
 
+* Sidebar shows active users with their colors
+* Auto-updates on join/leave
 
-Ask friends on the same WiFi to open:
+---
 
-http://192.168.x.x:3000
+##  Known Limitations / Bugs
 
 
+###  1. No permanent database
 
-How to Use
+* All canvas data lives **in-memory**
+* Rooms disappear when the server restarts
 
+###  2. Image placement scaling is basic
 
-Joining
+* Images are auto-scaled up to 400px max
+* No rotation/resizing handles yet
 
-Enter your name
+###  3. Shapes do not have fill mode
 
-Enter room name (any string, e.g., class1, project-room, demo)
+* Only outlines are supported
 
-Click Join
+###  4. No mobile zoom/pan
 
+* Mobile touch works, but the canvas cannot be panned or zoomed
 
-Drawing
+###  5. FPS/latency may vary if many users draw simultaneously
 
-Use bottom toolbar:
+* Socket traffic is high for freehand strokes
 
-Brush / Eraser
+###  6. Room names have no validation
 
-Shapes
+* Anyone typing the same name can join
 
-Image tool (click canvas → pick image)
+---
 
-Undo / Redo
+##  Time Spent on the Project
 
-Clear board
 
-Color & brush size also available
+| Task                              | Time       |
+| --------------------------------- | ---------- |
+| Basic canvas + brush drawing      | 2 hours    |
+| Socket.IO real-time sync          | 2 hours    |
+| Undo/redo, stroke grouping        | 1.5 hours  |
+| Shapes + preview                  | 1 hour     |
+| Image uploads                     | 2 hour     |
+| Mobile layout adjustments         | 1 hour     |
+| Cursors, participants, bug fixing | 2 hours    |
+| UI polishing, testing             | 1–2 hours  |
+| Debugging                         | 3 hours    | |
+| README & documentation            | 20 minutes |
 
-Participants
+**Total Estimated Time: ~15-17 hours**
 
-Sidebar shows active users with their colors
-
-Auto-updates on join/leave
-
-
-
-Known Limitations / Bugs
-
-
- 1. No permanent database
-
-All canvas data lives in-memory
-
-Rooms disappear when the server restarts
-
-
-2. Image placement scaling is basic
-
-Images are auto-scaled up to 400px max
-
-No rotation/resizing handles yet
-
-
-3. Shapes do not have fill mode
-
-Only outlines are supported
-
-
-4. No mobile zoom/pan
-
-Mobile touch works, but the canvas cannot be panned or zoomed
-
-
-5. FPS/latency may vary if many users draw simultaneously
-
-Socket traffic is high for freehand strokes
-
-
-6. Room names have no validation
-
-Anyone typing the same name can join
-
-
-
-Time Spent on the Project
-
-
-Basic canvas + brush drawing	2 hours
-Socket.IO real-time sync	    2 hours
-Undo/redo, stroke grouping	    1.5 hours
-Shapes + preview	            1 hour
-Image uploads	                2 hour
-Mobile layout adjustments	    1 hour
-Cursors, participants, bug fixing	2 hours
-UI polishing, testing	        1–2 hours
-Debugging                       3 hours
-README & documentation	        20 minutes
-
-
-Total Estimated Time: ~17-18 hours
 
