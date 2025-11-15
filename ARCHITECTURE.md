@@ -152,17 +152,17 @@ Only the active stroke is animated on the user’s canvas.
 
 Remote users receive only *finalized* segments.
 
-### ✔ Cursor preview separated (second canvas layer)
+### Cursor preview separated (second canvas layer)
 
 * Cursors & shape previews draw on `cursorCanvas`
 * Real strokes draw on `drawingCanvas`
 * Prevents flicker and avoids unnecessary redrawing
 
-### ✔ FPS counter (optional)
+###  FPS counter 
 
 Used to detect performance issues on slower devices.
 
-### ✔ Throttled cursor updates
+###  Throttled cursor updates
 
 ```
 emit cursor update only every 30 ms
@@ -170,7 +170,7 @@ emit cursor update only every 30 ms
 
 Prevents network spam.
 
-### ✔ Image scaling (max 200×200)
+###  Image scaling (max 200×200)
 
 Reduces bandwidth + rendering cost.
 
@@ -184,9 +184,9 @@ Two users might draw at the same time, or both draw shapes/images with overlappi
 
 ### Why it works without conflicts:
 
-✔ **Each stroke has strokeId + segments**
-✔ **Server appends strokes atomically in order of arrival**
-✔ **Canvas is reconstructed strictly in that order**
+ **Each stroke has strokeId + segments**
+ **Server appends strokes atomically in order of arrival**
+ **Canvas is reconstructed strictly in that order**
 
 ### Conflict handling details:
 
