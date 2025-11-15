@@ -37,7 +37,8 @@ io.on("connection", (socket) => {
     joinRoom(socket, roomId, username, clientId, io);
   });
 
-  socket.on("stroke", (stroke) => handleStroke(socket, stroke));
+  socket.on("stroke", (stroke) => handleStroke(socket, stroke, io));
+
   socket.on("clear-room", () => handleClear(socket, io));
   socket.on("undo", () => handleUndo(socket, io));
   socket.on("redo", () => handleRedo(socket, io));
