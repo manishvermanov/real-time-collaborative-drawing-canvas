@@ -24,7 +24,7 @@ const io = new Server(httpServer, {
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
-  res.send("Backend is running");
+  res.send("Backend is  again running");
 });
 
 io.on("connection", (socket) => {

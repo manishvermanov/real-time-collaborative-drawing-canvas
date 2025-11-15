@@ -176,42 +176,45 @@ function setupCanvas(socket, roomId, username) {
 
     // MAIN MOVEMENT HANDLER (Mouse and Touch)
 
-  function handleMove(e) {
-    e.preventDefault();
-    const { x, y } = getPos(e);
+ function handleMove(e) {
+  e.preventDefault();
+  const { x, y } = getPos(e);
 
-    myCursor.x = x;
-    myCursor.y = y;
-    renderCursors();
+  myCursor.x = x;
+  myCursor.y = y;
+  renderCursors();
 
-    // cursor emit
-    const now = Date.now();
-    if (now - lastCursorEmit > 30) {
-      socket.emit("cursor", { x, y });
-      lastCursorEmit = now;
-    }
-
-    if (!drawing) return;
-
-    let strokeColor = currentTool === "eraser" ? "#ffffff" : color;
-    let strokeSize = currentTool === "eraser" ? size * 2 : size;
-
-    const stroke = {
-      strokeId: currentStrokeId,
-      x,
-      y,
-      lastX,
-      lastY,
-      color: strokeColor,
-      size: strokeSize
-    };
-
-    drawStroke(stroke);
-    socket.emit("stroke", stroke);
-
-    lastX = x;
-    lastY = y;
+  const now = Date.now();
+  if (now - lastCursorEmit > 30) {
+    socket.emit("cursor", { x, y });
+    lastCursorEmit = now;
   }
+
+  if (!drawing) return;
+
+  // 🔥 FIX: prevent null strokeId being sent
+  if (!currentStrokeId) return;
+
+  let strokeColor = currentTool === "eraser" ? "#ffffff" : color;
+  let strokeSize = currentTool === "eraser" ? size * 2 : size;
+
+  const stroke = {
+    strokeId: currentStrokeId,
+    x,
+    y,
+    lastX,
+    lastY,
+    color: strokeColor,
+    size: strokeSize
+  };
+
+  drawStroke(stroke);
+  socket.emit("stroke", stroke);
+
+  lastX = x;
+  lastY = y;
+}
+
 
   
     // MOUSE and  TOUCH EVENTS
@@ -314,7 +317,8 @@ function setupCanvas(socket, roomId, username) {
       li.innerHTML = `
         <span class="user-dot" style="background:${u.color}"></span>
         <span style="color:${u.color}">
-          ${u.name}${u.name === username ? " (You)" : ""}
+          ${u.name || "(no name)"}${u.name === username ? " (You)" : ""}
+
         </span>
       `;
       userListEl.appendChild(li);
