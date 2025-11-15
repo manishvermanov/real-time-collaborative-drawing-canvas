@@ -1,4 +1,4 @@
-console.log("=== RUNNING THIS SERVER FILE ===");
+console.log("=== RUNNING SERVER ===");
 
 import express from "express";
 import { createServer } from "http";
@@ -30,19 +30,19 @@ app.get("/", (req, res) => {
 io.on("connection", (socket) => {
   console.log("[SERVER] Client connected:", socket.id);
 
-  // JOIN ROOM
   socket.on("join-room", ({ roomId, username, clientId }) => {
     console.log("[SERVER] join-room received:", roomId, username, clientId);
+
+    // IMPORTANT: joinRoom now stores reference so we don't import rooms again
     joinRoom(socket, roomId, username, clientId, io);
   });
 
-  // DRAW EVENTS
   socket.on("stroke", (stroke) => handleStroke(socket, stroke));
   socket.on("clear-room", () => handleClear(socket, io));
   socket.on("undo", () => handleUndo(socket, io));
   socket.on("redo", () => handleRedo(socket, io));
 
-  // CURSOR BROADCAST
+  // CURSOR EVENTS — use rooms reference from rooms.js directly
   socket.on("cursor", (pos) => {
     const roomId = socket.data.roomId;
     if (!roomId) return;
@@ -62,7 +62,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  // DISCONNECT
   socket.on("disconnect", () => handleDisconnect(socket, io));
 });
 

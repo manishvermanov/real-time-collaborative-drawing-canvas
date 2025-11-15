@@ -23,17 +23,25 @@ export function joinRoom(socket, roomId, username, clientId, io) {
   roomId = roomId.trim();
   username = username.trim();
 
+  if (!clientId) {
+    socket.emit("error-message", "Missing clientId.");
+    return;
+  }
+
   socket.join(roomId);
   socket.data.roomId = roomId;
   socket.data.username = username;
   socket.data.clientId = clientId;
 
+  // Create room if not exists
   ensureRoom(roomId, rooms);
+  socket.data._roomRef = rooms[roomId];
 
+  // ---- GET USER BY clientId (persistent identity) ----
   let user = rooms[roomId].users.find(u => u.clientId === clientId);
 
-  // NEW USER
   if (!user) {
+    // NEW USER
     user = {
       clientId,
       id: socket.id,
@@ -41,16 +49,18 @@ export function joinRoom(socket, roomId, username, clientId, io) {
       color: assignColor()
     };
     rooms[roomId].users.push(user);
-  }
-  // RECONNECTING USER
-  else {
-    user.id = socket.id;  // live socket id
-    user.name = username; // update name if changed
+  } else {
+    // RECONNECT USER — keep color
+    user.id = socket.id;
+    user.name = username;
   }
 
+  // Send previous strokes
   socket.emit("init-canvas", getRoomStrokes(roomId, rooms));
 
-  io.to(roomId).emit("update-user-list",
+  // Update user list for everyone
+  io.to(roomId).emit(
+    "update-user-list",
     rooms[roomId].users.map(u => ({
       id: u.id,
       name: u.name,
@@ -61,9 +71,9 @@ export function joinRoom(socket, roomId, username, clientId, io) {
 
 
 
-
-
+// --------------------
 // Undo / Redo
+// --------------------
 
 export function handleUndo(socket, io) {
   const roomId = socket.data.roomId;
@@ -83,24 +93,24 @@ export function handleRedo(socket, io) {
 
 
 
-// Stroke handling
-
+// --------------------
+// Stroke Handling
+// --------------------
 
 export function handleStroke(socket, stroke) {
   const roomId = socket.data.roomId;
   if (!roomId) return;
 
-  // Correct stroke grouping
   addStroke(roomId, stroke.strokeId, stroke, rooms);
 
-  // Broadcast to everyone except sender
   socket.to(roomId).emit("stroke", stroke);
 }
 
 
 
+// --------------------
 // Clear canvas
-
+// --------------------
 
 export function handleClear(socket, io) {
   const roomId = socket.data.roomId;
@@ -111,38 +121,49 @@ export function handleClear(socket, io) {
 }
 
 
-// Disconnect
 
+// --------------------
+// Disconnect Handling (Fully FIXED)
+// --------------------
 
 export function handleDisconnect(socket, io) {
   const roomId = socket.data.roomId;
-  const username = socket.data.username || "Anonymous";
+  const clientId = socket.data.clientId;
 
-  console.log(`User disconnected: ${username} (${socket.id})`);
+  if (!roomId || !rooms[roomId]) return;
 
-  if (roomId && rooms[roomId]) {
-    // Remove user
-    const usr = rooms[roomId].users.find(u => u.id === socket.id);
-if (usr) usr.id = null; // mark offline but preserve color + clientId
+  // Find persistent user
+  const user = rooms[roomId].users.find(u => u.clientId === clientId);
 
+  if (user) {
+    user.id = null; // offline but keep identity
+  }
 
-    socket.to(roomId).emit("user-left", { id: socket.id, name: username });
+  // Notify others
+  socket.to(roomId).emit("user-left", {
+    id: socket.id,
+    name: socket.data.username
+  });
 
-    // Update user list
-    const userList = rooms[roomId].users.map(u => ({
+  // Send updated user list
+  io.to(roomId).emit(
+    "update-user-list",
+    rooms[roomId].users.map(u => ({
       id: u.id,
       name: u.name,
       color: u.color
-    }));
+    }))
+  );
 
-    io.to(roomId).emit("update-user-list", userList);
 
-    // Delete room if empty
-    if (rooms[roomId].users.length === 0) {
-      delete rooms[roomId];
-      console.log(`Deleted empty room: ${roomId}`);
-    }
+  const hasOnline = rooms[roomId].users.some(u => u.id !== null);
+
+  if (!hasOnline) {
+    delete rooms[roomId];
+    console.log(`[ROOM DELETED] ${roomId}`);
   }
 }
+
+
 
 export { rooms };
