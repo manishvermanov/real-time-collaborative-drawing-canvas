@@ -1,29 +1,33 @@
-// import { setupCanvas } from "./canvas.js";
-// import { initSocket } from "./websocket.js";
+function getClientId() {
+  let id = sessionStorage.getItem("clientId");
+  if (!id) {
+    id = "u-" + Math.random().toString(36).substr(2, 9);
+    sessionStorage.setItem("clientId", id); //used session over local
+  }
+  return id;
+}
 
-// document.getElementById("joinBtn").addEventListener("click", () => {
-//   const username = document.getElementById("username").value.trim() || "Anonymous";
-//   const roomId = document.getElementById("roomId").value.trim() || "default";
 
-//   // hide join screen, show app
-//   document.getElementById("joinScreen").style.display = "none";
-//   document.getElementById("app").style.display = "block";
-
-//   const socket = initSocket(roomId, username);
-//   setupCanvas(socket, roomId, username);
-
-// });
 
 
 document.getElementById("joinBtn").addEventListener("click", () => {
-  const username = document.getElementById("username").value.trim() || "Anonymous";
-  const roomId = document.getElementById("roomId").value.trim() || "default";
+  const username = document.getElementById("username").value.trim();
+  const roomId = document.getElementById("roomId").value.trim();
+  const clientId = getClientId();
 
-  // Hide join screen, show app UI
+  if (!username) {
+    alert("Please enter a username.");
+    return;
+  }
+
+  if (!roomId) {
+    alert("Please enter a room name.");
+    return;
+  }
+
   document.getElementById("joinScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
 
-  // These functions come from websocket.js and canvas.js
-  const socket = window.initSocket(roomId, username);
+  const socket = window.initSocket(roomId, username, clientId);
   window.setupCanvas(socket, roomId, username);
 });

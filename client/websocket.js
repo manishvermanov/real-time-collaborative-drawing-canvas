@@ -1,28 +1,25 @@
-// export function initSocket(roomId, username) {
-//   const socket = io();
-
-//   socket.on("connect", () => {
-//     console.log("Connected to server:", socket.id);
-//     socket.emit("join-room", { roomId, username });
-//   });
-
-//   return socket;
-// }
-
-
-function initSocket(roomId, username) {
+function initSocket(roomId, username, clientId) {
   const socket = io("https://enchanting-clarity-production-7496.up.railway.app/", {
     transports: ["websocket"],
-    withCredentials: false
+    withCredentials: false,
+    auth: { clientId }     
   });
 
   socket.on("connect", () => {
     console.log("Connected to server:", socket.id);
-    socket.emit("join-room", { roomId, username });
+
+    socket.emit("join-room", { 
+      roomId, 
+      username, 
+      clientId            
+    });
+  });
+
+  socket.on("error-message", (msg) => {
+    alert(msg);
   });
 
   return socket;
 }
 
-// Make it usable globally
 window.initSocket = initSocket;

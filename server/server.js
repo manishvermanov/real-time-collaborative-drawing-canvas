@@ -1,3 +1,5 @@
+console.log("=== RUNNING THIS SERVER FILE ===");
+
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -6,21 +8,19 @@ import {
   joinRoom,
   handleStroke,
   handleClear,
-  handleDisconnect
+  handleDisconnect,
+  handleUndo,
+  handleRedo,
+  rooms
 } from "./rooms.js";
 
 const app = express();
 const httpServer = createServer(app);
 
-// ✔ REQUIRED FOR NETLIFY + RAILWAY
 const io = new Server(httpServer, {
-  cors: {
-    origin: "*",   // or put your Netlify URL
-    methods: ["GET", "POST"]
-  }
+  cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-// ✔ REQUIRED FOR RAILWAY
 const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
@@ -28,32 +28,42 @@ app.get("/", (req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log("New client connected:", socket.id);
+  console.log("[SERVER] Client connected:", socket.id);
 
-  socket.on("join-room", ({ roomId, username }) =>
-    joinRoom(socket, roomId, username, io)
-  );
+  // JOIN ROOM
+  socket.on("join-room", ({ roomId, username, clientId }) => {
+    console.log("[SERVER] join-room received:", roomId, username, clientId);
+    joinRoom(socket, roomId, username, clientId, io);
+  });
 
-  socket.on("stroke", (stroke) =>
-    handleStroke(socket, stroke)
-  );
+  // DRAW EVENTS
+  socket.on("stroke", (stroke) => handleStroke(socket, stroke));
+  socket.on("clear-room", () => handleClear(socket, io));
+  socket.on("undo", () => handleUndo(socket, io));
+  socket.on("redo", () => handleRedo(socket, io));
 
-  socket.on("clear-room", () =>
-    handleClear(socket, io)
-  );
+  // CURSOR BROADCAST
+  socket.on("cursor", (pos) => {
+    const roomId = socket.data.roomId;
+    if (!roomId) return;
 
-  socket.on("cursor", (data) => {
-    socket.to(socket.data.roomId).emit("cursor", {
+    const room = rooms[roomId];
+    if (!room) return;
+
+    const user = room.users.find(u => u.id === socket.id);
+    if (!user) return;
+
+    socket.to(roomId).emit("cursor", {
       id: socket.id,
-      username: socket.data.username,
-      x: data.x,
-      y: data.y
+      username: user.name,
+      color: user.color,
+      x: pos.x,
+      y: pos.y
     });
   });
 
-  socket.on("disconnect", () =>
-    handleDisconnect(socket, io)
-  );
+  // DISCONNECT
+  socket.on("disconnect", () => handleDisconnect(socket, io));
 });
 
 httpServer.listen(PORT, () => {

@@ -1,10 +1,177 @@
+/* Basic reset */
 body {
   margin: 0;
-  font-family: system-ui, Arial, sans-serif;
-  background: #f3f3f3;
+  font-family: "Inter", sans-serif;
+  background: #f4f5f7;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* Welcome screen */
+/* Navbar */
+#navbar {
+  height: 50px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+#navbar h2 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 20px;
+  color: #333;
+}
+
+/* Container layout */
+#container {
+  display: flex;
+  height: calc(100vh - 50px);
+}
+
+/* Sidebar */
+#sidebar {
+  width: 220px;
+  background: #ffffff;
+  border-right: 1px solid #e0e0e0;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  margin-top: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #444;
+}
+
+.room-label {
+  padding: 8px 12px;
+  background: #f1f1f1;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.sidebar-subtitle {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  color: #666;
+}
+
+/* User List */
+#userList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#userList li {
+  background: #f9f9f9;
+  padding: 10px 12px;
+  border: 1px solid #e4e4e4;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #333;
+  display: flex;
+  align-items: center;
+
+   list-style: none;
+
+
+}
+
+.user-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+
+/* Main area */
+#mainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Canvas wrapper with shadow */
+#canvasWrapper {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Important: no width/height here */
+#drawingCanvas,
+#cursorCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+#cursorCanvas {
+  pointer-events: none;   /* <-- ADD THIS */
+}
+
+/* Bottom Toolbar */
+#bottomToolbar {
+  margin-top: 12px;
+  padding: 10px 16px;
+  background: white;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+  align-self: flex-end;
+}
+
+#bottomToolbar input[type="color"],
+#bottomToolbar input[type="range"],
+#bottomToolbar button {
+  cursor: pointer;
+}
+
+/* Base button style */
+#bottomToolbar button {
+  background: #e0e0e0;     /* light gray */
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* On hover */
+#bottomToolbar button:hover {
+  background: #d5d5d5;
+}
+
+/* Highlight active tool */
+.tool-selected {
+  background: #4a90e2 !important; /* blue */
+  color: white !important;
+}
+
+
+/* Join screen (unchanged but cleaner) */
 #joinScreen {
   text-align: center;
   margin-top: 15%;
@@ -22,91 +189,10 @@ body {
   cursor: pointer;
 }
 
-/* App layout */
-#container {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-}
 
-/* Sidebar */
-#sidebar {
-  width: 20%;
-  background: #ffffff;
-  border-right: 1px solid #ddd;
-  padding: 15px;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
 
-#sidebar h3 {
-  margin-top: 0;
-  color: #333;
-  font-size: 18px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 8px;
-  width: 100%;
-}
 
-#userList {
-  list-style: none;
-  padding-left: 0;
-  margin: 0;
-  width: 100%;
-}
-
-#userList li {
-  background: #f9f9f9;
-  margin-bottom: 5px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  border: 1px solid #e0e0e0;
-  width: 100%;
-  word-break: break-word;
-}
-
-/* Main area */
-#mainContent {
-  flex: 1;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Toolbar on the right */
-.toolbar {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  z-index: 10;
-}
-
-.toolbar label {
-  font-size: 12px;
-  color: #333;
-}
-
-/* Canvas */
-#drawingCanvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1;
-}
-
+#drawingCanvas, 
 #cursorCanvas {
-  position: absolute;
-  left: 0;
-  top: 0;
-  pointer-events: none; /* Important */
-  z-index: 2;
+  cursor: none;   
 }
