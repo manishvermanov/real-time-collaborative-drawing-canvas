@@ -10,6 +10,31 @@ function setupCanvas(socket, roomId, username) {
   let strokeCounter = 0;
   let currentStrokeId = null;
 
+    // -------------------------
+  // FPS COUNTER
+  // -------------------------
+  let fpsFrames = 0;
+  let fpsLastTime = performance.now();
+
+  function fpsLoop(now) {
+    fpsFrames++;
+
+    const diff = now - fpsLastTime;
+    if (diff >= 1000) {
+      const fps = Math.round((fpsFrames * 1000) / diff);
+      fpsFrames = 0;
+      fpsLastTime = now;
+
+      const fpsEl = document.getElementById("fpsDisplay");
+      if (fpsEl) fpsEl.textContent = `FPS: ${fps}`;
+    }
+
+    requestAnimationFrame(fpsLoop);
+  }
+
+  requestAnimationFrame(fpsLoop);
+
+
   
   // POSITION HELPER (mouse + touch)
 

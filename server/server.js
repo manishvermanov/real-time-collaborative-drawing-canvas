@@ -62,6 +62,11 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("ping-check", (data) => {
+    // just bounce back same payload
+    socket.emit("pong-check", data);
+  });
+
   socket.on("disconnect", () => handleDisconnect(socket, io));
 });
 
